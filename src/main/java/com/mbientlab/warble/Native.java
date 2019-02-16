@@ -23,16 +23,14 @@
  */
 package com.mbientlab.warble;
 
-import jnr.ffi.annotations.Delegate;
-import jnr.ffi.annotations.Out;
+import jnr.ffi.annotations.*;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
-import jnr.ffi.Struct.StructRef;
 import jnr.ffi.types.u_int8_t;
 import jnr.ffi.types.u_int16_t;
 
-interface Native {
+public interface Native {
     final class ScanManufacturerData extends Struct {
         public final Pointer value = new Pointer();
         public final Unsigned8 value_size = new Unsigned8();
@@ -43,9 +41,9 @@ interface Native {
     }
 
     final class ScanResult extends Struct {
-        public final String mac = new AsciiString(17),
-            name = new AsciiString(8);
-        public final Unsigned32 rssi = new Unsigned32();
+        public final Pointer mac = new Pointer(),
+            name = new Pointer();
+        public final Signed32 rssi = new Signed32();
         public final Pointer private_data = new Pointer();
 
         public ScanResult(final Runtime runtime) {
@@ -54,12 +52,11 @@ interface Native {
     }
 
     final class Option extends Struct {
-        public final String key, value;
+        public final Pointer key = new Pointer(), 
+            value = new Pointer();
         
-        public Option(final Runtime runtime, final AsciiString key, final AsciiString value) {
+        public Option(final Runtime runtime) {
             super(runtime);
-            this.key = key;
-            this.value = value;
         }
     }
 
@@ -72,7 +69,7 @@ interface Native {
     }
 
     interface FnVoid_VoidP_WarbleScanResultP {
-        @Delegate void apply(Pointer context, @Out StructRef<ScanResult> result);
+        @Delegate void apply(Pointer context, Pointer pointer);
     }
 
     interface FnVoid_VoidP_WarbleGattCharP_CharP {
@@ -95,7 +92,7 @@ interface Native {
     void warble_scanner_start(int length, Option[] options);
     void warble_scanner_set_handler(Pointer context, FnVoid_VoidP_WarbleScanResultP handler);
 
-    StructRef<ScanManufacturerData> warble_scan_result_get_manufacturer_data(Pointer result, @u_int16_t short companyId);
+    ScanManufacturerData warble_scan_result_get_manufacturer_data(ScanResult result, @u_int16_t short companyId);
     int warble_scan_result_has_service_uuid(Pointer result, String uuid);
 
     void warble_gatt_connect_async(Pointer gatt, Pointer context, FnVoid_IntPtr_WarbleGattP_CharP handler);
