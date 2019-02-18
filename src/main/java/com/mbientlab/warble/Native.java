@@ -77,11 +77,11 @@ public interface Native {
     }
 
     interface FnVoid_VoidP_WarbleGattCharP_UbyteP_Ubyte_CharP {
-        @Delegate void apply(Pointer context, Pointer gattchar, Pointer value, byte length, String err);
+        @Delegate void apply(Pointer context, Pointer gattchar, Pointer value, @u_int8_t byte length, String err);
     }
 
     interface FnVoid_VoidP_WarbleGattCharP_UbyteP_Ubyte {
-        @Delegate void apply(Pointer context, Pointer gattchar, Pointer value, byte length);
+        @Delegate void apply(Pointer context, Pointer gattchar, Pointer value, @u_int8_t byte length);
     }
 
     String warble_lib_version();
