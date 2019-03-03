@@ -52,11 +52,16 @@ public interface Native {
     }
 
     final class Option extends Struct {
-        public final Pointer key = new Pointer(), 
-            value = new Pointer();
-        
+        public final AsciiStringRef key = new AsciiStringRef(16),
+            value = new AsciiStringRef(24);
+            
         public Option(final Runtime runtime) {
             super(runtime);
+        }
+
+        public void set(java.lang.String key, java.lang.String value) {
+            this.key.set(key);
+            this.value.set(value);
         }
     }
 
@@ -86,14 +91,14 @@ public interface Native {
 
     String warble_lib_version();
     String warble_lib_config();
-
     void warble_lib_init(int length, Option[] options);
+
     void warble_scanner_stop();
     void warble_scanner_start(int length, Option[] options);
     void warble_scanner_set_handler(Pointer context, FnVoid_VoidP_WarbleScanResultP handler);
 
     ScanManufacturerData warble_scan_result_get_manufacturer_data(ScanResult result, @u_int16_t short companyId);
-    int warble_scan_result_has_service_uuid(Pointer result, String uuid);
+    int warble_scan_result_has_service_uuid(ScanResult result, String uuid);
 
     void warble_gatt_connect_async(Pointer gatt, Pointer context, FnVoid_IntPtr_WarbleGattP_CharP handler);
     void warble_gatt_disconnect(Pointer gatt);

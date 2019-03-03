@@ -4,7 +4,11 @@
 package com.mbientlab.warble;
 
 public class Library {
-    public boolean someLibraryMethod() {
-        return true;
+    public static String version() {
+        return Gatt.LIB_WARBLE.warble_lib_version();
+    }
+
+    public static String config() {
+        return Gatt.LIB_WARBLE.warble_lib_config();
     }
 }

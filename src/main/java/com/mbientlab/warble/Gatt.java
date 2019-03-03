@@ -32,7 +32,8 @@ import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 
 public class Gatt {
-    static final Native LIB_WARBLE = LibraryLoader.create(Native.class).load("warble");
+    static final LibraryLoader<Native> LOADER = LibraryLoader.create(Native.class);
+    static final Native LIB_WARBLE = LOADER.load("warble");
 
     public final String mac;
     public Consumer<Integer> onDisconnect = (status) -> {
