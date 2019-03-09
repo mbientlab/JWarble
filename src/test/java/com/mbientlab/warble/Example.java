@@ -25,6 +25,8 @@ package com.mbientlab.warble;
 
 import org.testng.SkipException;
 import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.*;
+
 import java.lang.System;
 import java.util.Arrays;
 import java.util.Properties;
@@ -61,6 +63,8 @@ public class Example {
     public void connect() throws InterruptedException, ExecutionException {
         final Gatt gatt = setupGatt();
         gatt.connectAsync().thenCompose(ignored -> {
+            assertTrue(gatt.isConnected());
+
             try {
                 System.out.println("Connected to: " + gatt.mac);
                 Thread.sleep(5000);
@@ -76,6 +80,8 @@ public class Example {
         })
         .thenAccept(result -> System.out.println("Disconnected: status = " + result))
         .get();
+
+        assertFalse(gatt.isConnected());
     }
 
     @Test(timeOut = 10000)
@@ -98,6 +104,8 @@ public class Example {
                         System.out.println("Does not exist");
                         return CompletableFuture.completedFuture(new byte[0]);
                     }
+
+                    assertEquals(uuid, gattChar.uuid);
                     return gattChar.readAsync();
                 }).thenAccept(result -> System.out.println(new String(result)));
             }

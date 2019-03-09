@@ -102,6 +102,10 @@ public class Gatt {
         return asyncTask;
     }
 
+    public boolean isConnected() {
+        return Library.WARBLE.warble_gatt_is_connected(warbleGatt) != 0;
+    }
+
     public void disconnect() {
         Library.WARBLE.warble_gatt_disconnect(warbleGatt);
     }
