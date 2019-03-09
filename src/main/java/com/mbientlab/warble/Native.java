@@ -32,8 +32,8 @@ import jnr.ffi.types.u_int16_t;
 
 public interface Native {
     final class ScanManufacturerData extends Struct {
-        public final Pointer value = new Pointer();
-        public final Unsigned8 value_size = new Unsigned8();
+        final Pointer value = new Pointer();
+        final Unsigned8 value_size = new Unsigned8();
 
         public ScanManufacturerData(final Runtime runtime) {
             super(runtime);
@@ -41,9 +41,9 @@ public interface Native {
     }
 
     final class ScanResult extends Struct {
-        public final Pointer mac = new Pointer(),
+        final Pointer mac = new Pointer(),
             name = new Pointer();
-        public final Signed32 rssi = new Signed32();
+        final Signed32 rssi = new Signed32();
         public final Pointer private_data = new Pointer();
 
         public ScanResult(final Runtime runtime) {
@@ -52,14 +52,14 @@ public interface Native {
     }
 
     final class Option extends Struct {
-        public final AsciiStringRef key = new AsciiStringRef(16),
+        final AsciiStringRef key = new AsciiStringRef(16),
             value = new AsciiStringRef(24);
-            
+
         public Option(final Runtime runtime) {
             super(runtime);
         }
 
-        public void set(java.lang.String key, java.lang.String value) {
+        void set(java.lang.String key, java.lang.String value) {
             this.key.set(key);
             this.value.set(value);
         }
