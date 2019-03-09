@@ -28,4 +28,7 @@ dependencies {
 test {
     // Use TestNG for unit tests
     useTestNG()
+    options {
+        systemProperties(System.getProperties())
+    }
 }
