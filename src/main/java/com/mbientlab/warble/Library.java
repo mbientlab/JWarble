@@ -3,12 +3,16 @@
  */
 package com.mbientlab.warble;
 
+import jnr.ffi.LibraryLoader;
+
 public class Library {
+    static final Native WARBLE = LibraryLoader.create(Native.class).load("warble");
+
     public static String version() {
-        return Gatt.LIB_WARBLE.warble_lib_version();
+        return WARBLE.warble_lib_version();
     }
 
     public static String config() {
-        return Gatt.LIB_WARBLE.warble_lib_config();
+        return WARBLE.warble_lib_config();
     }
 }

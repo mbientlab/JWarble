@@ -35,15 +35,15 @@ public class Scanner {
             SCANTYPE_ACTIVE = "active";
 
     public static void onResultReceived(Consumer<ScanResult> handler) {
-        Gatt.LIB_WARBLE.warble_scanner_set_handler(null, (context, pointer) -> handler.accept(new ScanResult(pointer)));
+        Library.WARBLE.warble_scanner_set_handler(null, (context, pointer) -> handler.accept(new ScanResult(pointer)));
     }
 
     public static void start() {
-        Gatt.LIB_WARBLE.warble_scanner_start(0, null);
+        Library.WARBLE.warble_scanner_start(0, null);
     }
 
     public static void start(String scanType, String hciMac) {
-        Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(Gatt.LIB_WARBLE), Native.Option.class, 2);
+        Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(Library.WARBLE), Native.Option.class, 2);
         int i = 0;
 
         if (hciMac != null) {
@@ -55,10 +55,10 @@ public class Scanner {
             i++;
         }
 
-        Gatt.LIB_WARBLE.warble_scanner_start(i, opts);
+        Library.WARBLE.warble_scanner_start(i, opts);
     }
 
     public static void stop() {
-        Gatt.LIB_WARBLE.warble_scanner_stop();
+        Library.WARBLE.warble_scanner_stop();
     }
 }

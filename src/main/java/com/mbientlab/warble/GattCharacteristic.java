@@ -41,9 +41,9 @@ public class GattCharacteristic {
 
     public GattCharacteristic(Pointer warbleGattChar) {
         this.warbleGattChar = warbleGattChar;
-        this.uuid = Gatt.LIB_WARBLE.warble_gattchar_get_uuid(warbleGattChar);
+        this.uuid = Library.WARBLE.warble_gattchar_get_uuid(warbleGattChar);
         
-        Gatt.LIB_WARBLE.warble_gattchar_on_notification_received(warbleGattChar, null, (context, caller, value, length) -> {
+        Library.WARBLE.warble_gattchar_on_notification_received(warbleGattChar, null, (context, caller, value, length) -> {
             byte[] jvm_array = new byte[length];
             for(byte i = 0; i < length; i++) {
                 jvm_array[i] = value.getByte(i);
@@ -68,17 +68,17 @@ public class GattCharacteristic {
     }
 
     public CompletableFuture<Void> writeAsync(byte[] value) {
-        return writeAsync(handler -> Gatt.LIB_WARBLE.warble_gattchar_write_async(warbleGattChar, value, (byte) value.length, null, handler));
+        return writeAsync(handler -> Library.WARBLE.warble_gattchar_write_async(warbleGattChar, value, (byte) value.length, null, handler));
     }
 
     public CompletableFuture<Void> writeWithoutResponseAsync(byte[] value) {
-        return writeAsync(handler -> Gatt.LIB_WARBLE.warble_gattchar_write_without_resp_async(warbleGattChar, value, (byte) value.length, null, handler));
+        return writeAsync(handler -> Library.WARBLE.warble_gattchar_write_without_resp_async(warbleGattChar, value, (byte) value.length, null, handler));
     }
 
     public CompletableFuture<byte[]> readAsync() {
         final CompletableFuture<byte[]> asyncTask = new CompletableFuture<>();
 
-        Gatt.LIB_WARBLE.warble_gattchar_read_async(warbleGattChar, null, (ctx, caller, value, length, err) -> {
+        Library.WARBLE.warble_gattchar_read_async(warbleGattChar, null, (ctx, caller, value, length, err) -> {
             if (err != null) {
                 asyncTask.completeExceptionally(new GattCharacteristicException(err));
             } else {
@@ -109,10 +109,10 @@ public class GattCharacteristic {
     }
 
     public CompletableFuture<Void> enableNotificationsAsync() {
-        return editNotification(handler -> Gatt.LIB_WARBLE.warble_gattchar_enable_notifications_async(warbleGattChar, null, handler));
+        return editNotification(handler -> Library.WARBLE.warble_gattchar_enable_notifications_async(warbleGattChar, null, handler));
     }
 
     public CompletableFuture<Void> disableNotificationsAsync() {
-        return editNotification(handler -> Gatt.LIB_WARBLE.warble_gattchar_disable_notifications_async(warbleGattChar, null, handler));
+        return editNotification(handler -> Library.WARBLE.warble_gattchar_disable_notifications_async(warbleGattChar, null, handler));
     }
 }

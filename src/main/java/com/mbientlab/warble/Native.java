@@ -23,7 +23,7 @@
  */
 package com.mbientlab.warble;
 
-import jnr.ffi.annotations.*;
+import jnr.ffi.annotations.Delegate;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;

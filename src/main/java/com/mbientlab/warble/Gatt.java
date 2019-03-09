@@ -34,9 +34,6 @@ import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
 
 public class Gatt {
-    static final LibraryLoader<Native> LOADER = LibraryLoader.create(Native.class);
-    static final Native LIB_WARBLE = LOADER.load("warble");
-
     public static class Builder {
         private final String mac;
         private String hci = null, addrType = null;
@@ -59,7 +56,7 @@ public class Gatt {
         }
 
         public Gatt build() {
-            final Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(LIB_WARBLE), Native.Option.class, 3);
+            final Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(Library.WARBLE), Native.Option.class, 3);
             int i = 0;
 
             opts[i++].set("mac", mac);
@@ -69,7 +66,7 @@ public class Gatt {
             if (addrType != null) {
                 opts[i++].set("address-type", addrType);
             }
-            return new Gatt(LIB_WARBLE.warble_gatt_create_with_options(i, opts), mac);
+            return new Gatt(Library.WARBLE.warble_gatt_create_with_options(i, opts), mac);
         }
     }
 
@@ -83,19 +80,19 @@ public class Gatt {
         this.warbleGatt = warbleGatt;
         this.mac = mac;
 
-        LIB_WARBLE.warble_gatt_on_disconnect(warbleGatt, null, (ctx, caller, status) -> onDisconnect.accept(status));
+        Library.WARBLE.warble_gatt_on_disconnect(warbleGatt, null, (ctx, caller, status) -> onDisconnect.accept(status));
     }
 
     @Override
     protected void finalize() {
         characteristics.clear();
-        LIB_WARBLE.warble_gatt_delete(warbleGatt);
+        Library.WARBLE.warble_gatt_delete(warbleGatt);
     }
 
     public CompletableFuture<Void> connectAsync() {
         final CompletableFuture<Void> asyncTask = new CompletableFuture<>();
 
-        LIB_WARBLE.warble_gatt_connect_async(warbleGatt, null, (context, gatt, err) -> {
+        Library.WARBLE.warble_gatt_connect_async(warbleGatt, null, (context, gatt, err) -> {
             if (err == null) {
                 asyncTask.complete(null);
             } else {
@@ -107,16 +104,16 @@ public class Gatt {
     }
 
     public void disconnect() {
-        LIB_WARBLE.warble_gatt_disconnect(warbleGatt);
+        Library.WARBLE.warble_gatt_disconnect(warbleGatt);
     }
 
     public boolean serviceExists(String uuid) {
-        return LIB_WARBLE.warble_gatt_has_service(warbleGatt, uuid) != 0;
+        return Library.WARBLE.warble_gatt_has_service(warbleGatt, uuid) != 0;
     }
 
     public GattCharacteristic findCharacteristic(String uuid) {
         if (!characteristics.containsKey(uuid)) {
-            Pointer warbleGattChar = LIB_WARBLE.warble_gatt_find_characteristic(warbleGatt, uuid);
+            Pointer warbleGattChar = Library.WARBLE.warble_gatt_find_characteristic(warbleGatt, uuid);
             
             if (warbleGattChar != null) {
                 GattCharacteristic gattChar = new GattCharacteristic(warbleGattChar);

@@ -46,11 +46,11 @@ public class ScanResult {
     }
 
     public boolean hasServiceUuid(String uuid) {
-        return Gatt.LIB_WARBLE.warble_scan_result_has_service_uuid(nativeResult, uuid) != 0;
+        return Library.WARBLE.warble_scan_result_has_service_uuid(nativeResult, uuid) != 0;
     }
 
     public byte[] getManufacturerData(int companyId) {
-        Native.ScanManufacturerData data = Gatt.LIB_WARBLE.warble_scan_result_get_manufacturer_data(nativeResult, (short) (companyId & 0xffff));
+        Native.ScanManufacturerData data = Library.WARBLE.warble_scan_result_get_manufacturer_data(nativeResult, (short) (companyId & 0xffff));
         if (data != null) {
             byte[] jvm_array = new byte[data.value_size.get()];
             for(byte i = 0; i < jvm_array.length; i++) {
