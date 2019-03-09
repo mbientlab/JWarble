@@ -30,24 +30,66 @@ import java.util.Map;
 
 import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
+import jnr.ffi.Runtime;
+import jnr.ffi.Struct;
 
 public class Gatt {
     static final LibraryLoader<Native> LOADER = LibraryLoader.create(Native.class);
     static final Native LIB_WARBLE = LOADER.load("warble");
 
-    public final String mac;
-    public Consumer<Integer> onDisconnect = (status) -> {
+    public static class Builder {
+        private final String mac;
+        private String hci = null, addrType = null;
 
-    };
+        public Builder(String mac) {
+            this.mac = mac;
+            
+        }
+
+        public Builder withHci(String hci) {
+            if (!System.getProperty("os.name").contains("Windows")) {
+                this.hci = hci;
+            }
+            return this;
+        }
+
+        public Builder withAddressType(String addrType) {
+            this.addrType = addrType;
+            return this;
+        }
+
+        public Gatt build() {
+            final Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(LIB_WARBLE), Native.Option.class, 3);
+            int i = 0;
+
+            opts[i++].set("mac", mac);
+            if (hci != null) {
+                opts[i++].set("hci", hci);
+            }
+            if (addrType != null) {
+                opts[i++].set("address-type", addrType);
+            }
+            return new Gatt(LIB_WARBLE.warble_gatt_create_with_options(i, opts), mac);
+        }
+    }
+
+    public final String mac;
+    public Consumer<Integer> onDisconnect = (status) -> { };
 
     private final Pointer warbleGatt;
     private final Map<String, GattCharacteristic> characteristics = new HashMap<>();
 
-    public Gatt(String mac) {
+    private Gatt(Pointer warbleGatt, String mac) {
+        this.warbleGatt = warbleGatt;
         this.mac = mac;
 
-        this.warbleGatt = LIB_WARBLE.warble_gatt_create(this.mac);
         LIB_WARBLE.warble_gatt_on_disconnect(warbleGatt, null, (ctx, caller, status) -> onDisconnect.accept(status));
+    }
+
+    @Override
+    protected void finalize() {
+        characteristics.clear();
+        LIB_WARBLE.warble_gatt_delete(warbleGatt);
     }
 
     public CompletableFuture<Void> connectAsync() {
