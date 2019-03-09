@@ -24,7 +24,7 @@
 package com.mbientlab.warble;
 
 public class GattException extends RuntimeException {
-    public GattException(String msg) {
+    GattException(String msg) {
         super(msg);
     }
 }

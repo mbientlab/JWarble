@@ -25,21 +25,16 @@ package com.mbientlab.warble;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.HashMap;
-import java.util.Map;
 
-import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 
 public class GattCharacteristic {
     private final Pointer warbleGattChar;
 
     public final String uuid;
-    public Consumer<byte[]> onNotificationReceived = (value) -> {
+    public Consumer<byte[]> onNotificationReceived = (value) -> { };
 
-    };
-
-    public GattCharacteristic(Pointer warbleGattChar) {
+    GattCharacteristic(Pointer warbleGattChar) {
         this.warbleGattChar = warbleGattChar;
         this.uuid = Library.WARBLE.warble_gattchar_get_uuid(warbleGattChar);
         

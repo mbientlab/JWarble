@@ -33,13 +33,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.CompletableFuture;
 
 public class Example {
-    static final String PROPERTY_DEVICE_MAC = "warble.mac", 
+    private static final String PROPERTY_DEVICE_MAC = "warble.mac",
             PROPERTY_HCI_MAC = "warble.hci.mac",
             PROPERTY_ADDR_TYPE = "warble.address_type",
             PROPERTY_LESCAN_ENABLE = "warble.lescan.enable",
             PROPERTY_LESCAN_TYPE = "warble.lescan.type";
 
-    public Gatt setupGatt() {
+    private Gatt setupGatt() {
         final Gatt.Builder builder;
         final Properties properties = System.getProperties();
         if (!properties.containsKey(PROPERTY_DEVICE_MAC)) {
@@ -66,7 +66,7 @@ public class Example {
                 Thread.sleep(5000);
 
                 CompletableFuture<Integer> dcTask = new CompletableFuture<>();
-                gatt.onDisconnect = status -> dcTask.complete(status);
+                gatt.onDisconnect = dcTask::complete;
                 gatt.disconnect();
                 
                 return dcTask;
@@ -107,7 +107,7 @@ public class Example {
             System.out.println("Disconnecting...");
             CompletableFuture<Integer> dcTask = new CompletableFuture<>();
 
-            gatt.onDisconnect = status -> dcTask.complete(status);
+            gatt.onDisconnect = dcTask::complete;
             gatt.disconnect();
             
             return dcTask;

@@ -28,7 +28,6 @@ import java.util.function.Consumer;
 import java.util.HashMap;
 import java.util.Map;
 
-import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;

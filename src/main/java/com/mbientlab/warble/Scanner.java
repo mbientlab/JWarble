@@ -24,8 +24,6 @@
 package com.mbientlab.warble;
 
 import java.util.function.Consumer;
-import java.util.ArrayList;
-import java.util.List;
 
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
