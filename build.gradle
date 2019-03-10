@@ -9,6 +9,7 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'ivy-publish'
 }
 
 repositories {
@@ -30,5 +31,54 @@ test {
     useTestNG()
     options {
         systemProperties(System.getProperties())
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java
+    archiveClassifier = 'sources'
+}
+
+def emitVersion() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        executable 'git'
+        args 'describe', '--long', '--always'
+        standardOutput = stdout
+    }
+    
+    def tokens = stdout.toString().replaceAll("-",".").split('\\.')
+    return "${tokens[0]}.${tokens[1]}.${tokens[2].toInteger() + tokens[3].toInteger()}"
+}
+
+publishing {
+    repositories {
+        ivy {
+            url = properties.getProperty("ivy.repo")
+            credentials {
+                username properties.getProperty("ivy.repo.username")
+                password properties.getProperty("ivy.repo.password")
+            }
+        }
+    }
+
+    publications {
+        ivy(IvyPublication) {
+            organisation = "com.mbientlab"
+            module = "warble"
+            revision = emitVersion()
+
+            from components.java
+            artifact(sourcesJar) {
+                type = 'sources'
+                conf = 'compile'
+            }
+            descriptor.description {
+                text = description
+            }
+        }
     }
 }
