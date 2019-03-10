@@ -24,6 +24,7 @@
 package com.mbientlab.warble;
 
 import jnr.ffi.annotations.Delegate;
+import jnr.ffi.annotations.Encoding;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
@@ -41,8 +42,8 @@ public interface Native {
     }
 
     final class ScanResult extends Struct {
-        final Pointer mac = new Pointer(),
-            name = new Pointer();
+        final AsciiStringRef mac = new AsciiStringRef(12),
+            name = new AsciiStringRef(24);
         final Signed32 rssi = new Signed32();
         public final Pointer private_data = new Pointer();
 
@@ -66,7 +67,7 @@ public interface Native {
     }
 
     interface FnVoid_IntPtr_WarbleGattP_CharP {
-        @Delegate void apply(Pointer context, Pointer gatt, String err);
+        @Delegate void apply(Pointer context, Pointer gatt, @Encoding("US-ASCII") String err);
     }
 
     interface FnVoid_IntPtr_WarbleGattP_Int {
@@ -78,18 +79,20 @@ public interface Native {
     }
 
     interface FnVoid_VoidP_WarbleGattCharP_CharP {
-        @Delegate void apply(Pointer context, Pointer gattchar, String err);
+        @Delegate void apply(Pointer context, Pointer gattchar, @Encoding("US-ASCII") String err);
     }
 
     interface FnVoid_VoidP_WarbleGattCharP_UbyteP_Ubyte_CharP {
-        @Delegate void apply(Pointer context, Pointer gattchar, Pointer value, @u_int8_t byte length, String err);
+        @Delegate void apply(Pointer context, Pointer gattchar, Pointer value, @u_int8_t byte length, @Encoding("US-ASCII") String err);
     }
 
     interface FnVoid_VoidP_WarbleGattCharP_UbyteP_Ubyte {
         @Delegate void apply(Pointer context, Pointer gattchar, Pointer value, @u_int8_t byte length);
     }
 
+    @Encoding("US-ASCII")
     String warble_lib_version();
+    @Encoding("US-ASCII")
     String warble_lib_config();
     void warble_lib_init(int length, Option[] options);
 
@@ -98,18 +101,18 @@ public interface Native {
     void warble_scanner_set_handler(Pointer context, FnVoid_VoidP_WarbleScanResultP handler);
 
     ScanManufacturerData warble_scan_result_get_manufacturer_data(ScanResult result, @u_int16_t short companyId);
-    int warble_scan_result_has_service_uuid(ScanResult result, String uuid);
+    int warble_scan_result_has_service_uuid(ScanResult result, @Encoding("US-ASCII") String uuid);
 
     void warble_gatt_connect_async(Pointer gatt, Pointer context, FnVoid_IntPtr_WarbleGattP_CharP handler);
     void warble_gatt_disconnect(Pointer gatt);
     void warble_gatt_delete(Pointer gatt);
     void warble_gatt_on_disconnect(Pointer gatt, Pointer context, FnVoid_IntPtr_WarbleGattP_Int handler);
     int warble_gatt_is_connected(Pointer gatt);
-    Pointer warble_gatt_create(String mac);
+    Pointer warble_gatt_create(@Encoding("US-ASCII") String mac);
     Pointer warble_gatt_create_with_options(int length, Option[] options);
 
-    Pointer warble_gatt_find_characteristic(Pointer gatt, String uuid);
-    int warble_gatt_has_service(Pointer gatt, String uuid);
+    Pointer warble_gatt_find_characteristic(Pointer gatt, @Encoding("US-ASCII") String uuid);
+    int warble_gatt_has_service(Pointer gatt, @Encoding("US-ASCII") String uuid);
 
     void warble_gattchar_disable_notifications_async(Pointer gattchar, Pointer context, FnVoid_VoidP_WarbleGattCharP_CharP handler);
     void warble_gattchar_write_without_resp_async(Pointer gattchar, byte[] value, @u_int8_t byte value_size, Pointer context, FnVoid_VoidP_WarbleGattCharP_CharP handler);
@@ -117,6 +120,7 @@ public interface Native {
     void warble_gattchar_write_async(Pointer gattchar, byte[] value, @u_int8_t byte value_size, Pointer context, FnVoid_VoidP_WarbleGattCharP_CharP handler);
     void warble_gattchar_enable_notifications_async(Pointer gattchar, Pointer context, FnVoid_VoidP_WarbleGattCharP_CharP handler);
     void warble_gattchar_on_notification_received(Pointer gattchar, Pointer context, FnVoid_VoidP_WarbleGattCharP_UbyteP_Ubyte handler);
+    @Encoding("US-ASCII")
     String warble_gattchar_get_uuid(Pointer gattchar);
     Pointer warble_gattchar_get_gatt(Pointer gattchar);
 }

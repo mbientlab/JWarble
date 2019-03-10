@@ -34,11 +34,11 @@ public class ScanResult {
     }
 
     public String getMac() {
-        return nativeResult.mac.get().getString(0L);
+        return nativeResult.mac.get();
     }
 
     public String getName() {
-        return nativeResult.name.get().getString(0L);
+        return nativeResult.name.get();
     }
 
     public int getRssi() {
