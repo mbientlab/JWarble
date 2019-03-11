@@ -52,11 +52,14 @@ def emitVersion() {
     def stdout = new ByteArrayOutputStream()
     exec {
         executable 'git'
-        args 'describe', '--long', '--always'
+        args 'describe', '--long', '--always', '--dirty'
         standardOutput = stdout
     }
     
-    def tokens = stdout.toString().replaceAll("-",".").split('\\.')
+    def tokens = stdout.toString().trim().replaceAll("-",".").split('\\.')
+    if (tokens.last() == "dirty") {
+        throw new IllegalStateException("There are changes not commited to git")
+    }
     return "${tokens[0]}.${tokens[1]}.${tokens[2].toInteger() + tokens[3].toInteger()}"
 }
 
@@ -66,7 +69,7 @@ publishing {
 
     repositories {
         ivy {
-            url = properties.getProperty("ivy.repo")
+            url = properties.getProperty("ivy.repo.url")
             credentials {
                 username properties.getProperty("ivy.repo.username")
                 password properties.getProperty("ivy.repo.password")
@@ -78,7 +81,7 @@ publishing {
         ivy(IvyPublication) {
             organisation = "com.mbientlab"
             module = "warble"
-            revision = emitVersion()
+            revision = properties.getProperty("ivy.repo.version", emitVersion())
 
             from components.java
             artifact(sourcesJar) {
