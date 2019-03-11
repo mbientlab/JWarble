@@ -34,6 +34,15 @@ test {
     }
 }
 
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = configurations.compile
+    excludes = ['com/mbientlab/warble/Native*', 'jnr.ffi.*']
+    options.with {
+        links = ['https://docs.oracle.com/javase/8/docs/api/']
+    }
+}
+
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 

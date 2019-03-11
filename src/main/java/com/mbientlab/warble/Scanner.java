@@ -23,39 +23,63 @@
  */
 package com.mbientlab.warble;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
 
+/**
+ * Scans for nearby BLE devices
+ */
 public class Scanner {
-    public static final String SCANTYPE_PASSIVE = "passive",
-            SCANTYPE_ACTIVE = "active";
+    /**
+     * BLE scan types
+     */
+    public enum ScanType {
+        /** Only detect advertising data */
+        PASSIVE,
+        /** Requests scan response from the device in addition to the ad data */
+        ACTIVE
+    }
 
+    /**
+     * Sets a handler to process discovered devices
+     * @param handler Consumer to forwarded scan results to
+     */
     public static void onResultReceived(Consumer<ScanResult> handler) {
         Library.WARBLE.warble_scanner_set_handler(null, (context, pointer) -> handler.accept(new ScanResult(pointer)));
     }
 
+    /**
+     * Start the BLE scan with default options
+     */
     public static void start() {
         Library.WARBLE.warble_scanner_start(0, null);
     }
 
-    public static void start(String scanType, String hciMac) {
+    /**
+     * Start the BLE scan
+     * @param type   Type of BLE scan to perform, defaults to {@link ScanType#ACTIVE} if null
+     * @param hciMac MAC address of the HCI device to use as a hex string, null to have the system pick one
+     */
+    public static void start(ScanType type, String hciMac) {
         Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(Library.WARBLE), Native.Option.class, 2);
         int i = 0;
 
         if (hciMac != null) {
-            opts[i].set("hci", hciMac);
-            i++;
+            opts[i++].set("hci", hciMac);
         }
-        if (scanType != null) {
-            opts[i].set("scan-type", scanType);
-            i++;
+        if (type != null) {
+            opts[i++].set("scan-type", type.name().toLowerCase(Locale.US));
         }
 
         Library.WARBLE.warble_scanner_start(i, opts);
     }
 
+    /**
+     * Stop the BLE scan
+     */
     public static void stop() {
         Library.WARBLE.warble_scanner_stop();
     }

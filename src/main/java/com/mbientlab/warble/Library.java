@@ -25,13 +25,28 @@ package com.mbientlab.warble;
 
 import jnr.ffi.LibraryLoader;
 
+/**
+ * General library level functions
+ */
 public class Library {
     static final Native WARBLE = LibraryLoader.create(Native.class).load("warble");
 
+    private Library() {
+
+    }
+    
+    /**
+     * Checks the version of the native Warble C library used by the wrwapper
+     * @return Warble C library version in x.y.z format
+     */
     public static String version() {
         return WARBLE.warble_lib_version();
     }
 
+    /**
+     * Checks the build configuration of the native Warble C library used by the wrapper
+     * @return Either 'Release' or 'Debug'
+     */
     public static String config() {
         return WARBLE.warble_lib_config();
     }

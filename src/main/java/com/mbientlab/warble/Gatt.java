@@ -23,6 +23,7 @@
  */
 package com.mbientlab.warble;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.HashMap;
@@ -32,16 +33,45 @@ import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
 import jnr.ffi.Struct;
 
+/**
+ * Wrapper around the WarbleGatt C struct
+ */
 public class Gatt {
+    /**
+     * GAP address types.
+     * See this <a href='https://devzone.nordicsemi.com/f/nordic-q-a/2084/gap-address-types'>post </a>
+     * from the Nordic Dev Zone for more details on what each type means
+     */
+    public enum AddressType {
+        /** Public address */
+        PUBLIC,
+        /** Random address */
+        RANDOM,
+        /** Unspecified, only supported on Windows 10 */
+        UNSPECIFIED
+    }
+    /**
+     * Builder class to construct a {@link Gatt} object.
+     * Only the remote device's MAC address is required,
+     */
     public static class Builder {
         private final String mac;
-        private String hci = null, addrType = null;
+        private String hci = null;
+        private AddressType addrType = null;
 
+        /**
+         * Instantiates a builder
+         * @param mac MAC address of the remote device as a hex string
+         */
         public Builder(String mac) {
             this.mac = mac;
-            
         }
 
+        /**
+         * Sets the HCI mac address
+         * @param hci Hex string representation of the MAC address
+         * @return Calling object
+         */
         public Builder withHci(String hci) {
             if (!System.getProperty("os.name").contains("Windows")) {
                 this.hci = hci;
@@ -49,11 +79,20 @@ public class Gatt {
             return this;
         }
 
-        public Builder withAddressType(String addrType) {
+        /**
+         * Sets the Bluetooth address type
+         * @param addrType Device's address type
+         * @return Calling object
+         */
+        public Builder withAddressType(AddressType addrType) {
             this.addrType = addrType;
             return this;
         }
 
+        /**
+         * Build the Gatt object with the specified paramters
+         * @return Gatt object
+         */
         public Gatt build() {
             final Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(Library.WARBLE), Native.Option.class, 3);
             int i = 0;
@@ -63,13 +102,15 @@ public class Gatt {
                 opts[i++].set("hci", hci);
             }
             if (addrType != null) {
-                opts[i++].set("address-type", addrType);
+                opts[i++].set("address-type", addrType.name().toLowerCase(Locale.US));
             }
             return new Gatt(Library.WARBLE.warble_gatt_create_with_options(i, opts), mac);
         }
     }
 
+    /** MAC address of the remote Gatt device */
     public final String mac;
+    /** Handler that listens for disconnect events */
     public Consumer<Integer> onDisconnect = (status) -> { };
 
     private final Pointer warbleGatt;
@@ -88,6 +129,10 @@ public class Gatt {
         Library.WARBLE.warble_gatt_delete(warbleGatt);
     }
 
+    /**
+     * Establishes a connection to the remote device
+     * @return Null when task completes, {@link GattException} if task fails
+     */
     public CompletableFuture<Void> connectAsync() {
         final CompletableFuture<Void> asyncTask = new CompletableFuture<>();
 
@@ -102,18 +147,35 @@ public class Gatt {
         return asyncTask;
     }
 
+    /**
+     * Checks if currently connected to the remote device
+     * @return True if connected, false otherwise
+     */
     public boolean isConnected() {
         return Library.WARBLE.warble_gatt_is_connected(warbleGatt) != 0;
     }
 
+    /**
+     * Disconnects from the remote device
+     */
     public void disconnect() {
         Library.WARBLE.warble_gatt_disconnect(warbleGatt);
     }
 
+    /**
+     * Checks if the GATT services exists on the remote device
+     * @param uuid 128-bit UUID string to lookup
+     * @return True if service exists, false otherwise
+     */
     public boolean serviceExists(String uuid) {
         return Library.WARBLE.warble_gatt_has_service(warbleGatt, uuid) != 0;
     }
 
+    /**
+     * Find the GATT characteristic corresponding to the uuid string
+     * @param uuid 128-bit UUID string to lookup
+     * @return Object representing the GATT characteristic, null if it does not exist
+     */
     public GattCharacteristic findCharacteristic(String uuid) {
         if (!characteristics.containsKey(uuid)) {
             Pointer warbleGattChar = Library.WARBLE.warble_gatt_find_characteristic(warbleGatt, uuid);

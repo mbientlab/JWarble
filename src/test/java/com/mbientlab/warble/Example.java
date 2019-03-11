@@ -29,6 +29,7 @@ import static org.testng.AssertJUnit.*;
 
 import java.lang.System;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ExecutionException;
@@ -53,7 +54,7 @@ public class Example {
             builder.withHci(properties.getProperty(PROPERTY_HCI_MAC));
         }
         if (properties.containsKey(PROPERTY_ADDR_TYPE)) {
-            builder.withAddressType(properties.getProperty(PROPERTY_ADDR_TYPE));
+            builder.withAddressType(Gatt.AddressType.valueOf(properties.getProperty(PROPERTY_ADDR_TYPE).toUpperCase(Locale.US)));
         }
 
         return builder.build();
@@ -142,7 +143,8 @@ public class Example {
                 asyncTask.complete(null);
             }
         });
-        Scanner.start(System.getProperty(PROPERTY_LESCAN_TYPE, null), System.getProperty(PROPERTY_HCI_MAC, null));
+        String scanTypeName = System.getProperty(PROPERTY_LESCAN_TYPE, null);
+        Scanner.start(scanTypeName != null ? Scanner.ScanType.valueOf(scanTypeName) : null, System.getProperty(PROPERTY_HCI_MAC, null));
 
         asyncTask.get();
         Scanner.stop();

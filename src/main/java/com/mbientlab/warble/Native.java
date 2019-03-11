@@ -31,6 +31,9 @@ import jnr.ffi.Struct;
 import jnr.ffi.types.u_int8_t;
 import jnr.ffi.types.u_int16_t;
 
+/**
+ * jnr-ffi binding definitions for the Warble C library
+ */
 public interface Native {
     final class ScanManufacturerData extends Struct {
         final Pointer value = new Pointer();

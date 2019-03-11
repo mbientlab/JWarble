@@ -23,6 +23,9 @@
  */
 package com.mbientlab.warble;
 
+/**
+ * Represents errors that occur with a {@link Gatt} object
+ */
 public class GattException extends RuntimeException {
     GattException(String msg) {
         super(msg);

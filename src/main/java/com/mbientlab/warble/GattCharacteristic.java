@@ -28,10 +28,18 @@ import java.util.function.Consumer;
 
 import jnr.ffi.Pointer;
 
+/**
+ * Wrapper class around the WarbleGattChar C struct
+ */
 public class GattCharacteristic {
     private final Pointer warbleGattChar;
 
+    /** 128-bit UUID string identifying this GATT characteristic */
     public final String uuid;
+    /**
+     * Handler to process characteristic notification
+     * @see #enableNotificationsAsync()
+     */
     public Consumer<byte[]> onNotificationReceived = (value) -> { };
 
     GattCharacteristic(Pointer warbleGattChar) {
@@ -62,14 +70,28 @@ public class GattCharacteristic {
         return asyncTask;
     }
 
+    /**
+     * Writes value to the characteristic requiring an acknowledge from the remote device
+     * @param value Value to write to the characteristic
+     * @return Null when task completes, {@link GattCharacteristicException} if task fails
+     */
     public CompletableFuture<Void> writeAsync(byte[] value) {
         return writeAsync(handler -> Library.WARBLE.warble_gattchar_write_async(warbleGattChar, value, (byte) value.length, null, handler));
     }
 
+    /**
+     * Writes value to the characteristic without requesting a response from the remove device
+     * @param value Value to write to the characteristic
+     * @return Null when task completes, {@link GattCharacteristicException} if task fails
+     */
     public CompletableFuture<Void> writeWithoutResponseAsync(byte[] value) {
         return writeAsync(handler -> Library.WARBLE.warble_gattchar_write_without_resp_async(warbleGattChar, value, (byte) value.length, null, handler));
     }
 
+    /**
+     * Reads current value from the characteristic
+     * @return Value as a byte array when task completes, {@link GattCharacteristicException} if task fails
+     */
     public CompletableFuture<byte[]> readAsync() {
         final CompletableFuture<byte[]> asyncTask = new CompletableFuture<>();
 
@@ -103,10 +125,18 @@ public class GattCharacteristic {
         return asyncTask;
     }
 
+    /**
+     * Enables characteristic notifications, which are forwarded to the {@link #onNotificationReceived} consumer
+     * @return Null when task completes, {@link GattCharacteristicException} if task fails
+     */
     public CompletableFuture<Void> enableNotificationsAsync() {
         return editNotification(handler -> Library.WARBLE.warble_gattchar_enable_notifications_async(warbleGattChar, null, handler));
     }
 
+    /**
+     * Disables characteristic notifications
+     * @return Null when task completes, {@link GattCharacteristicException} if task fails
+     */
     public CompletableFuture<Void> disableNotificationsAsync() {
         return editNotification(handler -> Library.WARBLE.warble_gattchar_disable_notifications_async(warbleGattChar, null, handler));
     }

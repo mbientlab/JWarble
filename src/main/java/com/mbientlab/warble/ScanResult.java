@@ -25,30 +25,55 @@ package com.mbientlab.warble;
 
 import jnr.ffi.Pointer;
 
+/**
+ * Information received from a discovered BLE device
+ */
 public class ScanResult {
     private final Native.ScanResult nativeResult;
 
-    public ScanResult(Pointer address) {
+    ScanResult(Pointer address) {
         nativeResult = new Native.ScanResult(address.getRuntime());
         nativeResult.useMemory(address);
     }
 
+    /**
+     * Get the MAC address of the scanned device
+     * @return MAC address hex string
+     */
     public String getMac() {
         return nativeResult.mac.get();
     }
 
+    /**
+     * Get the device's advertising name
+     * @return BLE advertising name
+     */
     public String getName() {
         return nativeResult.name.get();
     }
 
+    /**
+     * Get the device's current signal strength
+     * @return Signal strength value
+     */
     public int getRssi() {
         return nativeResult.rssi.get();
     }
 
+    /**
+     * Checks if the BLE ad packet contains the GATT service uuid
+     * @param uuid 128-bit UUID string to lookup
+     * @return True if the service uuid is in the ad packet, false otherwise
+     */
     public boolean hasServiceUuid(String uuid) {
         return Library.WARBLE.warble_scan_result_has_service_uuid(nativeResult, uuid) != 0;
     }
 
+    /**
+     * Get additional data from the manufacturer included in the scan response
+     * @param companyId Company id to look up, between [0, 0xffff]
+     * @return Manufacturer data if company id is present in the scan response, null otherwise
+     */
     public byte[] getManufacturerData(int companyId) {
         Native.ScanManufacturerData data = Library.WARBLE.warble_scan_result_get_manufacturer_data(nativeResult, (short) (companyId & 0xffff));
         if (data != null) {
