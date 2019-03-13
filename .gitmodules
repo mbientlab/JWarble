@@ -1,0 +1,3 @@
+[submodule "libwarble"]
+	path = libwarble
+	url = https://github.com/mbientlab/Warble.git
