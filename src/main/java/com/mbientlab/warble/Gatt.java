@@ -73,7 +73,7 @@ public class Gatt {
          * @return Calling object
          */
         public Builder withHci(String hci) {
-            if (!System.getProperty("os.name").contains("Windows")) {
+            if (!Library.isWindows()) {
                 this.hci = hci;
             }
             return this;

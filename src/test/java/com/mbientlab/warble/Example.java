@@ -148,6 +148,12 @@ public class Example {
 
         asyncTask.get();
         Scanner.stop();
+    }
 
+    @Test
+    public void checkLibraryVersion() {
+        String version = Library.version();
+        System.out.println("warble version: " + version);
+        assertEquals("1.1", version.substring(0, version.lastIndexOf(".")));
     }
 }

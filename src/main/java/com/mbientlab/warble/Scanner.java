@@ -67,7 +67,7 @@ public class Scanner {
         Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(Library.WARBLE), Native.Option.class, 2);
         int i = 0;
 
-        if (hciMac != null) {
+        if (!Library.isWindows() && hciMac != null) {
             opts[i++].set("hci", hciMac);
         }
         if (type != null) {

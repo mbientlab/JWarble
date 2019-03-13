@@ -24,6 +24,10 @@
 package com.mbientlab.warble;
 
 import jnr.ffi.LibraryLoader;
+import jnr.ffi.Runtime;
+import jnr.ffi.Struct;
+
+import java.util.Locale;
 
 /**
  * General library level functions
@@ -31,10 +35,25 @@ import jnr.ffi.LibraryLoader;
 public class Library {
     static final Native WARBLE = LibraryLoader.create(Native.class).load("warble");
 
+    /**
+     * API log levels
+     */
+    public enum LogLevel {
+        TRACE,
+        DEBUG,
+        INFO,
+        WARNING,
+        ERROR
+    }
+
     private Library() {
 
     }
-    
+
+    static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase(Locale.US).contains("windows");
+    }
+
     /**
      * Checks the version of the native Warble C library used by the wrwapper
      * @return Warble C library version in x.y.z format
@@ -49,5 +68,19 @@ public class Library {
      */
     public static String config() {
         return WARBLE.warble_lib_config();
+    }
+
+    /**
+     * Initializes the Warble library
+     * @param bleppLogLevel libblepp log level, only available on Linux
+     */
+    public static void init(LogLevel bleppLogLevel) {
+        Native.Option[] opts = Struct.arrayOf(Runtime.getRuntime(Library.WARBLE), Native.Option.class, 1);
+        int i = 0;
+
+        if (!isWindows() && bleppLogLevel != null) {
+            opts[i++].set("log-level", bleppLogLevel.name().toLowerCase(Locale.US));
+        }
+        WARBLE.warble_lib_init(i, opts);
     }
 }

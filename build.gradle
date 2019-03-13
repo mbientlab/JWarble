@@ -57,9 +57,6 @@ def emitVersion() {
     }
     
     def tokens = stdout.toString().trim().replaceAll("-",".").split('\\.')
-    if (tokens.last() == "dirty") {
-        throw new IllegalStateException("There are changes not commited to git")
-    }
     return "${tokens[0]}.${tokens[1]}.${tokens[2].toInteger() + tokens[3].toInteger()}"
 }
 
